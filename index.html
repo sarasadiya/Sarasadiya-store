@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sarasadiya Store</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #f8f8f8; padding: 1rem; }
+    h1 { text-align: center; color: #2e7d32; }
+    .product { border: 1px solid #ccc; border-radius: 10px; padding: 1rem; margin: 1rem 0; background: white; display: flex; gap: 1rem; align-items: center; }
+    .product img { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; }
+    .product-details { flex-grow: 1; }
+    .product input { width: 60px; margin-top: 0.5rem; }
+    .product button { background: #2e7d32; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; }
+    .stock { font-weight: bold; color: #555; margin-top: 0.5rem; }
+    #cart { background: #fff; padding: 1rem; margin-top: 2rem; border-radius: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    #cart ul { padding-left: 20px; }
+    #cart button { background: #25d366; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Sarasadiya Store</h1>
+  <div id="product-list"></div>
+
+  <div id="cart">
+    <h2>🛒 আপনার কার্ট</h2>
+    <ul id="cart-items"></ul>
+    <p><strong>মোট দাম: ₹<span id="total">0</span></strong></p>
+    <p>🪙 অর্জিত পয়েন্ট: <span id="points">0</span></p>
+    <a id="whatsapp-link" href="#" target="_blank">
+      <button>📲 WhatsApp এ অর্ডার করুন</button>
+    </a>
+  </div>
+
+  <script>
+    const csvUrl = "product_list_with_images.csv";
+    const productList = document.getElementById("product-list");
+    const cartItems = document.getElementById("cart-items");
+    const totalEl = document.getElementById("total");
+    const pointsEl = document.getElementById("points");
+    const whatsappLink = document.getElementById("whatsapp-link");
+
+    const cart = [];
+
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        results.data.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className = "product";
+          div.innerHTML = `
+            <img src="${item.image}" alt="${item.name}">
+            <div class="product-details">
+              <strong>${item.name}</strong>
+              <p>মূল্য: ₹${item.price}/${item.unit}</p>
+              <p class="stock">📦 স্টকে আছে: ${item.stock}</p>
+              <input type="number" value="1" min="1" max="${item.stock}" id="qty-${index}">
+              <button onclick="addToCart('${item.name}', ${item.price}, ${item.stock}, '${item.unit}', ${index})">Add to Cart</button>
+            </div>
+          `;
+          productList.appendChild(div);
+        });
+      }
+    });
+
+    function addToCart(name, price, stock, unit, index) {
+      const qty = parseInt(document.getElementById(`qty-${index}`).value);
+      if (qty > stock || qty <= 0) {
+        alert("⚠️ সঠিক পরিমাণ লিখুন (স্টকের মধ্যে)");
+        return;
+      }
+      cart.push({ name, price, qty, unit });
+      updateCart();
+    }
+
+    function updateCart() {
+      cartItems.innerHTML = "";
+      let total = 0;
+      let points = 0;
+      let message = "আমি নিচের পণ্যগুলো অর্ডার করতে চাই:\n";
+
+      cart.forEach(item => {
+        const line = `${item.name} - ${item.qty}${item.unit} - ₹${item.qty * item.price}`;
+        const li = document.createElement("li");
+        li.textContent = line;
+        cartItems.appendChild(li);
+        total += item.qty * item.price;
+        points += Math.floor((item.qty * item.price) / 10);
+        message += `• ${line}\n`;
+      });
+
+      totalEl.textContent = total;
+      pointsEl.textContent = points;
+      message += `\nমোট দাম: ₹${total}\nপ্রাপ্ত পয়েন্ট: ${points}`;
+      const encoded = encodeURIComponent(message);
+      whatsappLink.href = `https://wa.me/919749989009?text=${encoded}`;
+    }
+  </script>
+</body>
+</html>
