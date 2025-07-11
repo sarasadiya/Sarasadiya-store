@@ -1,18 +1,1 @@
-# Re-create CSV file after environment reset
-import pandas as pd
-
-products = [
-    {"name": "চাল (বসুমতি)", "category": "চাল", "price": 60, "unit": "kg", "stock": 100, "points_required": 0, "image": "https://via.placeholder.com/150"},
-    {"name": "মসুর ডাল", "category": "ডাল", "price": 85, "unit": "kg", "stock": 80, "points_required": 0, "image": "https://via.placeholder.com/150"},
-    {"name": "সরিষার তেল", "category": "তেল", "price": 160, "unit": "litre", "stock": 50, "points_required": 0, "image": "https://via.placeholder.com/150"},
-    {"name": "প্যাকেট নুন", "category": "নুন", "price": 10, "unit": "pkt", "stock": 300, "points_required": 0, "image": "https://via.placeholder.com/150"},
-    {"name": "ছোটা মাসালা", "category": "পয়েন্ট", "price": 0, "unit": "pkt", "stock": 40, "points_required": 20, "image": "https://via.placeholder.com/150"},
-    {"name": "পয়েন্ট সাবান", "category": "পয়েন্ট", "price": 0, "unit": "pcs", "stock": 20, "points_required": 30, "image": "https://via.placeholder.com/150"}
-]
-
-df = pd.DataFrame(products)
-csv_path = "/mnt/data/product_list_with_stock.csv"
-df.to_csv(csv_path, index=False)
-
-csv_path
 
